@@ -43,6 +43,8 @@ bloque_sitio() {
 cat <<EOF
     DocumentRoot "${APP_DIR}"
     DirectoryIndex index.html
+    # Tildes y eñes correctas (también en las vistas previas de redes sociales)
+    AddDefaultCharset UTF-8
 
     <Directory "${APP_DIR}">
         Options -Indexes +FollowSymLinks

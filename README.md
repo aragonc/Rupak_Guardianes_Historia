@@ -31,7 +31,74 @@ Juego de plataformas hecho en Scratch y empaquetado con TurboWarp Packager. Kusi
 
 ### Publicarlo en internet
 
-La carpeta completa (`index.html`, `script.js` y `assets/`) se puede subir a cualquier hosting de páginas estáticas, por ejemplo GitHub Pages, itch.io (como juego HTML), Netlify o el servidor del colegio. Una vez publicado, se abre con un enlace normal y no hace falta el servidor local.
+El juego se publica en **https://rupak.playschool.edu.pe**, en un VPS con Apache2. Una vez publicado, se abre con un enlace normal y no hace falta el servidor local. Los pasos están en [Despliegue en el VPS](#despliegue-en-el-vps-apache2).
+
+## Despliegue en el VPS (Apache2)
+
+Son solo archivos estáticos: no hace falta PHP, Node ni base de datos. El script [`deploy/deploy.sh`](deploy/deploy.sh) hace todo el trabajo:
+
+- Actualiza el código con `git pull`.
+- Instala Apache y Certbot si faltan.
+- Ajusta los permisos y activa los módulos de Apache (`headers`, `deflate`, `ssl`, `http2`).
+- Genera la configuración del sitio en `/etc/apache2/sites-available/rupak.playschool.edu.pe.conf`.
+- Obtiene el certificado HTTPS de Let's Encrypt (solo la primera vez) y redirige HTTP → HTTPS.
+- Comprueba que el juego responde.
+
+Si Apache rechaza una configuración nueva, el script restaura la anterior y el sitio sigue funcionando.
+
+### Primera vez
+
+**1. DNS.** En el panel DNS de `playschool.edu.pe`, crea un registro **A**: `rupak` → IP del VPS. Verifícalo con:
+```bash
+ping rupak.playschool.edu.pe
+```
+
+**2. Clonar el repositorio en el VPS** (por SSH):
+```bash
+cd /var/www
+sudo git clone https://github.com/aragonc/Rupak_Guardianes_Historia.git rupak
+sudo chown -R $USER:$USER /var/www/rupak
+```
+Si el repositorio es privado, clónalo con SSH (`git@github.com:aragonc/Rupak_Guardianes_Historia.git`) usando una *deploy key* de GitHub.
+
+**3. Abrir los puertos** (si usas `ufw`):
+```bash
+sudo ufw allow 'Apache Full'
+```
+
+**4. Desplegar:**
+```bash
+cd /var/www/rupak
+sudo EMAIL=tu-correo@playschool.edu.pe ./deploy/deploy.sh
+```
+`EMAIL` es opcional: Let's Encrypt lo usa para avisar si el certificado está por vencer.
+
+Si el DNS todavía no apunta al VPS, el sitio queda en HTTP. Cuando el DNS ya funcione, vuelve a ejecutar el script y activará HTTPS.
+
+### Actualizar el juego
+
+1. Desde tu computadora, sube los cambios: `git push`.
+2. En el VPS, ejecuta:
+   ```bash
+   cd /var/www/rupak && sudo ./deploy/deploy.sh
+   ```
+
+### Opciones del script
+
+| Comando | Qué hace |
+|---|---|
+| `sudo ./deploy/deploy.sh` | Actualiza con `git pull` y publica |
+| `sudo ./deploy/deploy.sh --sin-pull` | Publica sin actualizar el código |
+| `sudo ./deploy/deploy.sh --sin-https` | Solo HTTP, sin pedir certificado |
+| `./deploy/deploy.sh --imprimir-conf` | Muestra la configuración de Apache que generaría, sin instalar nada |
+| `sudo DOMINIO=otro.dominio.pe ./deploy/deploy.sh` | Usa otro dominio |
+
+### Seguridad
+
+El repositorio completo queda dentro de la carpeta del sitio, así que la configuración bloquea lo que no debe ser público:
+
+- `/.git/` y `/deploy/` devuelven 404.
+- `README.md`, `index.original.html` y los archivos ocultos (`.gitignore`, `.env`…) devuelven 403.
 
 ## Controles
 
@@ -65,6 +132,9 @@ Rupak_Guardianes_Historia/
 ├── index.original.html   ← copia de respaldo, tal como salió del TurboWarp Packager
 ├── script.js             ← motor de TurboWarp
 ├── assets/               ← proyecto (project.json), imágenes y sonidos
+├── deploy/
+│   └── deploy.sh         ← despliegue en el VPS (Apache2 + HTTPS)
+├── .gitignore
 └── README.md
 ```
 
@@ -90,4 +160,8 @@ al final de `index.html`.
 | *"Address already in use"* al iniciar el servidor | Ese puerto está ocupado. Usa otro, por ejemplo `python3 -m http.server 8080`. |
 | El celular no carga la página | Revisa que el celular esté en la misma red Wi‑Fi y que el firewall permita el puerto. |
 | No aparecen los botones en el celular | Toca el botón **🎮** de arriba a la derecha. |
+| La web muestra la página por defecto de Apache | Vuelve a ejecutar `sudo ./deploy/deploy.sh` y revisa los mensajes del script. |
+| `Forbidden` (403) en el dominio | Vuelve a ejecutar `sudo ./deploy/deploy.sh`: el script corrige los permisos. |
+| Certbot falla al validar | El DNS todavía no apunta al VPS, o el firewall bloquea los puertos 80 y 443 (`sudo ufw allow 'Apache Full'`). Corrígelo y vuelve a ejecutar el script. |
+| `git pull falló` | Hay cambios hechos a mano en el VPS. Revísalos con `git -C /var/www/rupak status`. |
 | No gira a horizontal | Gira el celular a mano. En iPhone no se puede forzar la rotación, y en Android revisa que la rotación automática no esté bloqueada. |

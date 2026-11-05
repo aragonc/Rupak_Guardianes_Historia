@@ -143,6 +143,7 @@ Rupak_Guardianes_Historia/
 ├── index.html            ← página del juego (incluye los controles táctiles)
 ├── index.original.html   ← copia de respaldo, tal como salió del TurboWarp Packager
 ├── script.js             ← motor de TurboWarp
+├── og-image.jpg          ← imagen de vista previa al compartir (1200×630)
 ├── assets/               ← proyecto (project.json), imágenes y sonidos
 ├── deploy/
 │   └── deploy.sh         ← despliegue en el VPS (Apache2 + HTTPS)
@@ -156,6 +157,7 @@ Estos cambios se hicieron a mano en `index.html`, después de exportar desde Tur
 
 1. **Controles táctiles flotantes.** Envían al juego las mismas teclas que el teclado.
 1. **Botón "Acerca del juego"** con la información y los créditos del proyecto.
+1. **Vista previa al compartir.** Se agregaron título, descripción e imagen (`og-image.jpg`) para Facebook, WhatsApp y X, con etiquetas Open Graph y Twitter Card. Las etiquetas usan la dirección `https://rupak.playschool.edu.pe/`: si el juego cambia de dominio, actualízala en `index.html`.
 2. **Vertical u horizontal.** En vertical, el juego queda arriba y los controles debajo. Al empezar en el celular, el juego pasa a pantalla completa. Los botones se ocultan mientras se escribe.
 3. **Etiquetas `meta` para celular.** Permiten respetar la muesca de la pantalla (`viewport-fit=cover`) y abrir el juego en pantalla completa desde el ícono de inicio en iPhone.
 
@@ -166,6 +168,8 @@ al final de `index.html`.
 > **Ojo:** si vuelves a exportar el juego desde TurboWarp Packager, el `index.html` nuevo no tendrá estos cambios. Para recuperarlos, copia el bloque marcado y pégalo antes de `</body>` en el nuevo `index.html`. Copia también las etiquetas `meta` del inicio del archivo.
 
 ## Problemas comunes
+
+> **Vista previa al compartir:** Facebook y WhatsApp guardan la vista previa de cada enlace por varios días. Si la compartiste antes de publicar los cambios, actualízala en el [depurador de Facebook](https://developers.facebook.com/tools/debug/) con el botón **"Volver a extraer"**.
 
 | Problema | Solución |
 |---|---|

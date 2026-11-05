@@ -353,8 +353,9 @@
       width: 40px; height: 40px; border-radius: 10px; border: 2px solid rgba(255,255,255,.6);
       background: rgba(0,0,0,.4); color: #fff; font-size: 20px; padding: 0;
       touch-action: manipulation; opacity: .7; }
-    #tc-toggle { right: calc(8px + env(safe-area-inset-right, 0px)); }
-    #tc-full   { right: calc(56px + env(safe-area-inset-right, 0px)); }
+    #tc-info   { right: calc(8px + env(safe-area-inset-right, 0px)); font: bold 20px/1 Georgia, serif; }
+    #tc-toggle { right: calc(56px + env(safe-area-inset-right, 0px)); }
+    #tc-full   { right: calc(104px + env(safe-area-inset-right, 0px)); }
     #tc-full[hidden] { display: none; }
     /* Celular en vertical: el juego arriba, los controles debajo.
        Así el teclado en pantalla solo tapa los controles, no el juego. */
@@ -372,6 +373,46 @@
       #tc-enter { width: 62px; height: 62px; right: 16px; bottom: calc(156px + env(safe-area-inset-bottom, 0px)); }
       .tc-top   { top: calc(var(--tc-stage-h) + env(safe-area-inset-top, 0px) + 10px); }
     }
+    /* Modal "Acerca del juego" */
+    #ag-modal { position: fixed; inset: 0; z-index: 100003; display: flex;
+      align-items: center; justify-content: center; padding: 16px;
+      background: rgba(20, 10, 4, .72); }
+    #ag-modal[hidden] { display: none; }
+    #ag-card { position: relative; width: 100%; max-width: 640px; max-height: 100%;
+      overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+      background: #fbf1df; color: #3a2414; border: 4px solid #8a4b22; border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.5); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+      text-align: left; cursor: auto; user-select: text; -webkit-user-select: text; }
+    #ag-card header { position: sticky; top: 0; z-index: 1; padding: 20px 56px 14px 24px;
+      background: linear-gradient(#b5371f, #962c18); color: #fff7ea; border-bottom: 3px solid #8a4b22; }
+    #ag-card h2 { margin: 0; font: 800 clamp(20px, 5vw, 26px)/1.15 Georgia, "Times New Roman", serif; letter-spacing: .5px; }
+    #ag-card header p { margin: 6px 0 0; font-size: 14px; opacity: .92; }
+    #ag-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; padding: 0;
+      border-radius: 50%; border: 2px solid rgba(255,247,234,.8); background: rgba(0,0,0,.2);
+      color: #fff7ea; font: 22px/1 sans-serif; cursor: pointer; }
+    #ag-close:focus-visible { outline: 3px solid #ffd27a; outline-offset: 2px; }
+    #ag-body { padding: 8px 24px 24px; }
+    #ag-body h3 { margin: 22px 0 8px; color: #962c18; font: 700 13px/1.3 system-ui, sans-serif;
+      text-transform: uppercase; letter-spacing: 1.5px; }
+    #ag-body p { margin: 0 0 10px; }
+    #ag-body strong { color: #5b2a10; }
+    .ag-goal { margin: 14px 0 4px; padding: 12px 14px; border-left: 4px solid #d9822b;
+      background: #f5e3c3; border-radius: 0 8px 8px 0; }
+    .ag-credits { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+    .ag-credits li { padding: 10px 12px; background: #fff8ec; border: 1px solid #e6cfa8; border-radius: 10px; }
+    .ag-credits b { display: block; color: #5b2a10; }
+    .ag-credits span { font-size: 14px; opacity: .85; }
+    .ag-link { display: inline-block; margin-top: 4px; padding: 10px 16px; border-radius: 10px;
+      background: #8a4b22; color: #fff7ea !important; text-decoration: none !important; font-weight: 700; }
+    .ag-link:hover, .ag-link:focus-visible { background: #6f3b19; }
+    .ag-quote { margin: 22px 0 0; padding-top: 16px; border-top: 1px dashed #c9a77a;
+      text-align: center; font: italic 17px/1.5 Georgia, serif; color: #6f3b19; }
+    @media (max-width: 480px) {
+      #ag-modal { padding: 8px; }
+      #ag-card header { padding: 16px 52px 12px 16px; }
+      #ag-body { padding: 4px 16px 20px; }
+    }
+
     @media (max-height: 420px) {
       .tc-move { width: 64px; height: 64px; bottom: 14px; }
       #tc-right { left: calc(96px + env(safe-area-inset-left, 0px)); }
@@ -389,6 +430,44 @@
   </div>
   <button id="tc-toggle" class="tc-top" title="Mostrar/ocultar controles táctiles">🎮</button>
   <button id="tc-full" class="tc-top" title="Pantalla completa" hidden>⛶</button>
+  <button id="tc-info" class="tc-top" title="Acerca del juego" aria-haspopup="dialog" aria-controls="ag-modal">i</button>
+  <div id="ag-modal" hidden role="dialog" aria-modal="true" aria-labelledby="ag-title">
+    <article id="ag-card" tabindex="-1">
+      <header>
+        <h2 id="ag-title">Rupak: Guardianes de la Historia</h2>
+        <p>Un videojuego para descubrir, aprender y proteger nuestro patrimonio cultural</p>
+        <button id="ag-close" type="button" aria-label="Cerrar">×</button>
+      </header>
+      <div id="ag-body">
+        <h3>Descripción del proyecto</h3>
+        <p><em>Rupak: Guardianes de la Historia</em> es un videojuego educativo de aventuras y plataformas que busca enseñar a los niños la riqueza histórica, arqueológica y cultural del valle de Huaral de una manera divertida e interactiva.</p>
+        <p>La protagonista es <strong>Kusi</strong>, una niña aventurera que emprende un recorrido por diferentes escenarios históricos para descubrir los secretos de las antiguas civilizaciones que habitaron nuestro territorio.</p>
+        <p>Durante su aventura, conocerá la <strong>cultura Chancay</strong>, explorará el antiguo complejo arqueológico de <strong>Las Shicras</strong> y descubrirá la historia de los <strong>Atavillos</strong> y la ciudadela de <strong>Rupak</strong>.</p>
+        <p>A lo largo del juego, Kusi deberá explorar los escenarios, recolectar monedas y encontrar objetos arqueológicos que representan los conocimientos y las tradiciones de nuestros antepasados. Al reunir las reliquias, deberá entregarlas al sabio, quien pondrá a prueba sus conocimientos mediante preguntas relacionadas con la historia y la cultura.</p>
+        <p>El videojuego combina entretenimiento, exploración y aprendizaje, promoviendo el reconocimiento, la valoración y la protección de nuestro patrimonio cultural.</p>
+        <p class="ag-goal"><strong>Nuestro objetivo:</strong> demostrar que la historia también puede aprenderse jugando y que las nuevas generaciones pueden convertirse en guardianes de su propia identidad cultural.</p>
+
+        <h3>Créditos del proyecto</h3>
+        <ul class="ag-credits">
+          <li><b>Santiago Rafael Morales Gutiérrez</b><span>Programación y mecánicas del videojuego en Scratch.</span></li>
+          <li><b>Joaquín Alva Suárez</b><span>Investigación histórica, guion narrativo y preguntas educativas.</span></li>
+          <li><b>Fabricio Gael Galarza Ticona</b><span>Diseño artístico de personajes, escenarios e interfaz.</span></li>
+          <li><b>Alex Rubén Aragón Calixto</b><span>Docente asesor.</span></li>
+          <li><b>Play School</b><span>Institución educativa.</span></li>
+        </ul>
+
+        <h3>Agradecimiento especial</h3>
+        <p>Al <strong>Arquitecto Walter Tosso Morales</strong>, Director del Proyecto Arqueológico Pisquillo - Huaral, por su valioso aporte de datos históricos y conocimientos que contribuyeron a enriquecer el contenido cultural y educativo de este videojuego.</p>
+        <p>Su colaboración nos permitió acercarnos más a nuestra historia y fortalecer el propósito de difundir y valorar el patrimonio arqueológico de nuestra provincia.</p>
+
+        <h3>Código fuente del videojuego</h3>
+        <p>El videojuego ha sido desarrollado utilizando Scratch. Su proyecto y código fuente se encuentran disponibles públicamente para consulta y exploración:</p>
+        <p><a class="ag-link" href="https://scratch.mit.edu/projects/1409314289/" target="_blank" rel="noopener">Ver videojuego y código fuente en Scratch ↗</a></p>
+
+        <p class="ag-quote">«Conociendo nuestro pasado, protegemos nuestro futuro.<br>¡Convirtámonos en guardianes de nuestra historia!»</p>
+      </div>
+    </article>
+  </div>
   <script>
     (function () {
       const root = document.getElementById('tc-root');
@@ -474,6 +553,39 @@
       document.addEventListener('focusout', (e) => {
         if (esTexto(e.target)) { escribiendo = false; apply(); }
       });
+
+      // ---- Modal "Acerca del juego" ----
+      const infoBtn = document.getElementById('tc-info');
+      const modal = document.getElementById('ag-modal');
+      const card = document.getElementById('ag-card');
+      const closeBtn = document.getElementById('ag-close');
+      const abrirInfo = (e) => {
+        if (e) e.stopPropagation();
+        releaseAll();
+        modal.hidden = false;
+        card.scrollTop = 0;
+        closeBtn.focus({ preventScroll: true });
+      };
+      const cerrarInfo = () => { modal.hidden = true; infoBtn.focus({ preventScroll: true }); };
+      infoBtn.addEventListener('click', abrirInfo);
+      closeBtn.addEventListener('click', (e) => { e.stopPropagation(); cerrarInfo(); });
+      modal.addEventListener('click', (e) => { e.stopPropagation(); if (e.target === modal) cerrarInfo(); });
+      // Con el modal abierto, el teclado no mueve al personaje; Escape lo cierra
+      ['keydown', 'keyup', 'keypress'].forEach((t) => window.addEventListener(t, (e) => {
+        if (modal.hidden) return;
+        if (t === 'keydown' && e.key === 'Escape') { e.preventDefault(); cerrarInfo(); }
+        if (t === 'keydown' && e.key === 'Tab') {   // mantener el foco dentro del modal
+          const f = modal.querySelectorAll('button, a[href]');
+          const first = f[0], last = f[f.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+          return;
+        }
+        if (e.key !== 'Tab') e.stopImmediatePropagation();
+      }, true));
+      // Que tocar o hacer clic en el modal no llegue al juego
+      ['pointerdown', 'mousedown', 'touchstart', 'wheel'].forEach((t) =>
+        modal.addEventListener(t, (e) => e.stopPropagation(), { passive: true }));
 
       window.addEventListener('blur', releaseAll);
       document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAll(); });

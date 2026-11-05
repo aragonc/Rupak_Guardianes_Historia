@@ -116,6 +116,10 @@ El repositorio completo queda dentro de la carpeta del sitio, así que la config
 - Se pueden presionar dos botones a la vez; por ejemplo, correr y saltar.
 - El botón **🎮** (arriba a la derecha) muestra u oculta los controles, y el navegador recuerda la elección. En la computadora también sirve para mostrarlos y probarlos con el ratón.
 
+### Acerca del juego
+
+El botón **i** (arriba a la derecha) abre una ventana con la descripción del proyecto, los créditos, el agradecimiento especial y el enlace al proyecto en Scratch. Se cierra con **×**, tocando fuera de la ventana o con la tecla `Esc`. Mientras está abierta, el teclado no mueve a Kusi.
+
 ### Vertical u horizontal
 
 El juego funciona con el celular en las dos posiciones. Cada jugador elige la que prefiera:
@@ -151,6 +155,7 @@ Rupak_Guardianes_Historia/
 Estos cambios se hicieron a mano en `index.html`, después de exportar desde TurboWarp Packager:
 
 1. **Controles táctiles flotantes.** Envían al juego las mismas teclas que el teclado.
+1. **Botón "Acerca del juego"** con la información y los créditos del proyecto.
 2. **Vertical u horizontal.** En vertical, el juego queda arriba y los controles debajo. Al empezar en el celular, el juego pasa a pantalla completa. Los botones se ocultan mientras se escribe.
 3. **Etiquetas `meta` para celular.** Permiten respetar la muesca de la pantalla (`viewport-fit=cover`) y abrir el juego en pantalla completa desde el ícono de inicio en iPhone.
 

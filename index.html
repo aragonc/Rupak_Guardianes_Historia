@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-visual">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -356,15 +356,21 @@
     #tc-toggle { right: calc(8px + env(safe-area-inset-right, 0px)); }
     #tc-full   { right: calc(56px + env(safe-area-inset-right, 0px)); }
     #tc-full[hidden] { display: none; }
-    /* Aviso para girar el celular */
-    #tc-rotate { display: none; position: fixed; inset: 0; z-index: 100001;
-      background: #000; color: #fff; font: 20px/1.4 sans-serif; text-align: center;
-      flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; }
-    #tc-rotate .tc-phone { font-size: 64px; animation: tc-spin 2s ease-in-out infinite; }
-    #tc-rotate small { opacity: .7; font-size: 15px; }
-    @keyframes tc-spin { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
+    /* Celular en vertical: el juego arriba, los controles debajo.
+       Así el teclado en pantalla solo tapa los controles, no el juego. */
     @media (orientation: portrait) and (pointer: coarse) {
-      #tc-rotate { display: flex; }
+      :root { --tc-stage-h: min(75vw, calc(100vh - 230px)); }
+      @supports (height: 100svh) {
+        :root { --tc-stage-h: min(75vw, calc(100svh - 230px)); }
+      }
+      #app { top: env(safe-area-inset-top, 0px); height: var(--tc-stage-h); }
+      .tc-move  { width: 80px; height: 80px; bottom: calc(48px + env(safe-area-inset-bottom, 0px)); }
+      #tc-left  { left: 16px; }
+      #tc-right { left: 108px; }
+      #tc-jump  { width: 96px; height: 96px; right: 16px; bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
+      #tc-act   { width: 62px; height: 62px; right: 100px; bottom: calc(156px + env(safe-area-inset-bottom, 0px)); }
+      #tc-enter { width: 62px; height: 62px; right: 16px; bottom: calc(156px + env(safe-area-inset-bottom, 0px)); }
+      .tc-top   { top: calc(var(--tc-stage-h) + env(safe-area-inset-top, 0px) + 10px); }
     }
     @media (max-height: 420px) {
       .tc-move { width: 64px; height: 64px; bottom: 14px; }
@@ -383,19 +389,15 @@
   </div>
   <button id="tc-toggle" class="tc-top" title="Mostrar/ocultar controles táctiles">🎮</button>
   <button id="tc-full" class="tc-top" title="Pantalla completa" hidden>⛶</button>
-  <div id="tc-rotate">
-    <div class="tc-phone">📱</div>
-    <div>Gira tu celular para jugar</div>
-    <small>Toca aquí para pantalla completa</small>
-  </div>
   <script>
     (function () {
       const root = document.getElementById('tc-root');
       const toggle = document.getElementById('tc-toggle');
       const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
       let visible = isTouch;
+      let escribiendo = false;
       try { const s = localStorage.getItem('tc-visible'); if (s !== null) visible = s === '1'; } catch (e) {}
-      const apply = () => { root.hidden = !visible; };
+      const apply = () => { root.hidden = !visible || escribiendo; };
       apply();
       toggle.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -443,9 +445,8 @@
           btn.addEventListener(t, (e) => { e.preventDefault(); e.stopPropagation(); }, { passive: false }));
       });
 
-      // ---- Pantalla completa + horizontal ----
+      // ---- Pantalla completa (vertical u horizontal, como el usuario prefiera) ----
       const fullBtn = document.getElementById('tc-full');
-      const rotateMsg = document.getElementById('tc-rotate');
       const de = document.documentElement;
       const reqFS = de.requestFullscreen || de.webkitRequestFullscreen;
       const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
@@ -454,9 +455,6 @@
         if (!canFS) return;
         try {
           if (!fsElement()) await reqFS.call(de, { navigationUI: 'hide' });
-          if (screen.orientation && screen.orientation.lock) {
-            await screen.orientation.lock('landscape').catch(() => {});
-          }
         } catch (e) {}
       };
       const updateFullBtn = () => { fullBtn.hidden = !(isTouch && canFS && !fsElement()); };
@@ -464,11 +462,18 @@
       document.addEventListener('fullscreenchange', updateFullBtn);
       document.addEventListener('webkitfullscreenchange', updateFullBtn);
       fullBtn.addEventListener('click', (e) => { e.stopPropagation(); goFull(); });
-      rotateMsg.addEventListener('click', (e) => { e.stopPropagation(); goFull(); });
-      if (!canFS) rotateMsg.querySelector('small').textContent = 'En iPhone: Compartir → "Agregar a inicio" para jugar sin barras';
-      // Al tocar "empezar" en el celular, entra en pantalla completa y gira
+      // Al tocar "empezar" en el celular, entra en pantalla completa
       const launch = document.getElementById('launch');
       if (launch && isTouch) launch.addEventListener('click', goFull);
+
+      // Mientras se escribe una respuesta (teclado en pantalla), ocultar los botones
+      const esTexto = (el) => !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
+      document.addEventListener('focusin', (e) => {
+        if (esTexto(e.target)) { escribiendo = true; releaseAll(); apply(); }
+      });
+      document.addEventListener('focusout', (e) => {
+        if (esTexto(e.target)) { escribiendo = false; apply(); }
+      });
 
       window.addEventListener('blur', releaseAll);
       document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAll(); });

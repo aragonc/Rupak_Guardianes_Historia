@@ -116,13 +116,21 @@ El repositorio completo queda dentro de la carpeta del sitio, así que la config
 - Se pueden presionar dos botones a la vez; por ejemplo, correr y saltar.
 - El botón **🎮** (arriba a la derecha) muestra u oculta los controles, y el navegador recuerda la elección. En la computadora también sirve para mostrarlos y probarlos con el ratón.
 
-### Pantalla completa y modo horizontal
+### Vertical u horizontal
 
-- **Android (Chrome):** al tocar la pantalla de inicio, el juego pasa a pantalla completa y gira a horizontal. Si sales de la pantalla completa, toca el botón **⛶** para volver.
-- **Celular en vertical:** aparece el aviso "Gira tu celular para jugar".
-- **iPhone (Safari):** Safari no permite poner una página en pantalla completa ni bloquear la rotación. Para jugar sin las barras del navegador, usa **Compartir → "Agregar a inicio"** y abre el juego desde ese ícono.
+El juego funciona con el celular en las dos posiciones. Cada jugador elige la que prefiera:
 
-El juego mantiene su proporción original de 4:3. En celulares anchos quedan franjas negras a los lados, y ahí se ubican los botones táctiles para no tapar la escena.
+- **Horizontal:** el juego se ve más grande y los botones quedan a los costados.
+- **Vertical:** el juego queda arriba y los botones debajo. Conviene usarlo cuando el juego pide **escribir una respuesta**, porque el teclado en pantalla solo tapa los botones y el juego sigue a la vista.
+
+Mientras escribes, los botones táctiles se ocultan solos y vuelven al terminar.
+
+### Pantalla completa
+
+- **Android (Chrome):** al tocar la pantalla de inicio, el juego pasa a pantalla completa, sin bloquear la rotación. Si sales de la pantalla completa, toca el botón **⛶** para volver.
+- **iPhone (Safari):** Safari no permite poner una página en pantalla completa. Para jugar sin las barras del navegador, usa **Compartir → "Agregar a inicio"** y abre el juego desde ese ícono.
+
+El juego mantiene su proporción original de 4:3, así que en horizontal quedan franjas negras a los lados. Los botones van en esas franjas.
 
 ## Archivos
 
@@ -143,7 +151,7 @@ Rupak_Guardianes_Historia/
 Estos cambios se hicieron a mano en `index.html`, después de exportar desde TurboWarp Packager:
 
 1. **Controles táctiles flotantes.** Envían al juego las mismas teclas que el teclado.
-2. **Pantalla completa y bloqueo en horizontal.** Se activan al empezar en el celular, y se agregó el aviso para girar el celular.
+2. **Vertical u horizontal.** En vertical, el juego queda arriba y los controles debajo. Al empezar en el celular, el juego pasa a pantalla completa. Los botones se ocultan mientras se escribe.
 3. **Etiquetas `meta` para celular.** Permiten respetar la muesca de la pantalla (`viewport-fit=cover`) y abrir el juego en pantalla completa desde el ícono de inicio en iPhone.
 
 Todo el código agregado está entre los comentarios
@@ -164,4 +172,5 @@ al final de `index.html`.
 | `Forbidden` (403) en el dominio | Vuelve a ejecutar `sudo ./deploy/deploy.sh`: el script corrige los permisos. |
 | Certbot falla al validar | El DNS todavía no apunta al VPS, o el firewall bloquea los puertos 80 y 443 (`sudo ufw allow 'Apache Full'`). Corrígelo y vuelve a ejecutar el script. |
 | `git pull falló` | Hay cambios hechos a mano en el VPS. Revísalos con `git -C /var/www/rupak status`. |
-| No gira a horizontal | Gira el celular a mano. En iPhone no se puede forzar la rotación, y en Android revisa que la rotación automática no esté bloqueada. |
+| El juego no cambia al girar el celular | Revisa que la rotación automática del celular no esté bloqueada. |
+| El teclado tapa el juego al escribir | Pon el celular en vertical: el juego queda arriba y el teclado solo tapa los botones. |

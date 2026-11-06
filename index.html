@@ -393,6 +393,10 @@
       #tc-enter { width: 62px; height: 62px; right: 16px; bottom: calc(156px + env(safe-area-inset-bottom, 0px)); }
       .tc-top   { top: calc(var(--tc-stage-h) + env(safe-area-inset-top, 0px) + 10px); }
     }
+    /* Logos del concurso y del colegio (solo en el menú principal) */
+    .lg-logo { position: fixed; z-index: 99998; pointer-events: none; opacity: 0;
+      transition: opacity .35s ease; object-fit: contain; }
+    .lg-logo.lg-on { opacity: 1; }
     /* Modal "Acerca del juego" */
     #ag-modal { position: fixed; inset: 0; z-index: 100003; display: flex;
       align-items: center; justify-content: center; padding: 16px;
@@ -448,6 +452,8 @@
     <div class="tc-btn" id="tc-enter" data-key="Enter">ENTER</div>
     <div class="tc-btn" id="tc-jump"  data-key=" ">SALTAR</div>
   </div>
+  <img id="lg-crea" class="lg-logo" src="img/logo_crea.png" alt="Concurso CREA 3.0 - Segunda categoría" hidden>
+  <img id="lg-play" class="lg-logo" src="img/logo_playschool.png" alt="Play School" hidden>
   <button id="tc-toggle" class="tc-top" title="Mostrar/ocultar controles táctiles">🎮</button>
   <button id="tc-full" class="tc-top" title="Pantalla completa" hidden>⛶</button>
   <button id="tc-info" class="tc-top" title="Acerca del juego" aria-haspopup="dialog" aria-controls="ag-modal">i</button>
@@ -606,6 +612,65 @@
       // Que tocar o hacer clic en el modal no llegue al juego
       ['pointerdown', 'mousedown', 'touchstart', 'wheel'].forEach((t) =>
         modal.addEventListener(t, (e) => e.stopPropagation(), { passive: true }));
+
+      // ---- Logos CREA y Play School: visibles solo en el menú principal ----
+      // Siguen al logo "titulo" del propio juego, que se oculta al tocar JUGAR
+      // y vuelve a aparecer al regresar al menú.
+      const lgCrea = document.getElementById('lg-crea');
+      const lgPlay = document.getElementById('lg-play');
+      const enMenu = () => {
+        if (!window.vm || !window.vm.runtime) return false;
+        const launch = document.getElementById('launch');
+        const loading = document.getElementById('loading');
+        if ((launch && !launch.hidden) || (loading && !loading.hidden)) return false;
+        const logo = window.vm.runtime.getSpriteTargetByName('Logo');
+        if (!logo || !logo.visible) return false;
+        const c = logo.getCostumes()[logo.currentCostume];
+        return !!c && c.name === 'titulo';
+      };
+      const ubicar = (img, x, y, w, h) => {
+        Object.assign(img.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+      };
+      const ubicarLogos = () => {
+        const canvas = document.querySelector('#app canvas');
+        if (!canvas) return false;
+        const r = canvas.getBoundingClientRect();
+        const W = window.innerWidth, H = window.innerHeight;
+        const izq = r.left, der = W - r.right, abajo = H - r.bottom;
+        if (Math.min(izq, der) >= 90) {
+          // Franjas laterales (computadora / celular en horizontal)
+          const top = Math.max(r.top + r.height * 0.1, 56);
+          const w1 = Math.min(izq - 24, 220), h1 = Math.min(w1 * 200 / 300, r.height * 0.32);
+          const w2 = Math.min(der - 24, 200), h2 = Math.min(w2 * 117 / 207, r.height * 0.3);
+          ubicar(lgCrea, (izq - w1) / 2, top, w1, h1);
+          ubicar(lgPlay, r.right + (der - w2) / 2, top + (h1 - h2) / 2, w2, h2);
+          return true;
+        }
+        if (abajo >= 160) {
+          // Debajo del juego (celular en vertical), por encima de los controles
+          const top = r.bottom + 60;
+          const alto = Math.min(90, abajo * 0.22);
+          const w1 = Math.min(alto * 300 / 200, W * 0.42), w2 = Math.min(alto * 207 / 117, W * 0.42);
+          const gap = Math.max(16, (W - w1 - w2) / 3);
+          ubicar(lgCrea, gap, top, w1, w1 * 200 / 300);
+          ubicar(lgPlay, W - gap - w2, top + (w1 * 200 / 300 - w2 * 117 / 207) / 2, w2, w2 * 117 / 207);
+          return true;
+        }
+        return false;   // sin espacio libre: no se muestran para no tapar el juego
+      };
+      let logosVisibles = null;
+      const actualizarLogos = () => {
+        const mostrar = enMenu() && ubicarLogos();
+        if (mostrar !== logosVisibles) {
+          logosVisibles = mostrar;
+          [lgCrea, lgPlay].forEach((img) => {
+            if (mostrar) { img.hidden = false; requestAnimationFrame(() => img.classList.add('lg-on')); }
+            else { img.classList.remove('lg-on'); img.hidden = true; }
+          });
+        }
+      };
+      setInterval(actualizarLogos, 150);
+      window.addEventListener('resize', () => { if (logosVisibles) ubicarLogos(); });
 
       window.addEventListener('blur', releaseAll);
       document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAll(); });

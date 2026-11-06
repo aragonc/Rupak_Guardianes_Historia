@@ -144,6 +144,7 @@ Rupak_Guardianes_Historia/
 ├── index.original.html   ← copia de respaldo, tal como salió del TurboWarp Packager
 ├── script.js             ← motor de TurboWarp
 ├── og-image.jpg          ← imagen de vista previa al compartir (1200×630)
+├── img/                  ← logos del Concurso CREA 3.0 y de Play School (pantalla de inicio)
 ├── assets/               ← proyecto (project.json), imágenes y sonidos
 ├── deploy/
 │   └── deploy.sh         ← despliegue en el VPS (Apache2 + HTTPS)
@@ -157,6 +158,7 @@ Estos cambios se hicieron a mano en `index.html`, después de exportar desde Tur
 
 1. **Controles táctiles flotantes.** Envían al juego las mismas teclas que el teclado.
 1. **Botón "Acerca del juego"** con la información y los créditos del proyecto.
+1. **Logos del Concurso CREA 3.0 y de Play School** en la pantalla de inicio, a los lados del juego (o debajo, con el celular en vertical). Se ocultan al tocar **Jugar** y vuelven al regresar al menú principal, igual que el logo de Rupak.
 1. **Vista previa al compartir.** Se agregaron título, descripción e imagen (`og-image.jpg`) para Facebook, WhatsApp y X, con etiquetas Open Graph y Twitter Card. Las etiquetas usan la dirección `https://rupak.playschool.edu.pe/`: si el juego cambia de dominio, actualízala en `index.html`.
 2. **Vertical u horizontal.** En vertical, el juego queda arriba y los controles debajo. Al empezar en el celular, el juego pasa a pantalla completa. Los botones se ocultan mientras se escribe.
 3. **Etiquetas `meta` para celular.** Permiten respetar la muesca de la pantalla (`viewport-fit=cover`) y abrir el juego en pantalla completa desde el ícono de inicio en iPhone.

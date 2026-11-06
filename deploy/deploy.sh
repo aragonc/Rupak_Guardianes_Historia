@@ -71,6 +71,10 @@ cat <<EOF
     <Directory "${APP_DIR}/assets">
         <IfModule mod_headers.c>
             Header set Cache-Control "public, max-age=2592000, immutable"
+            # project.json (textos y lógica del juego) cambia sin cambiar de nombre
+            <Files "project.json">
+                Header set Cache-Control "no-cache"
+            </Files>
         </IfModule>
     </Directory>
 
